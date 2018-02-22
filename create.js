@@ -4,7 +4,7 @@
  */
 
 import uuid from "uuid";
-import * as dynamoDbLib from "./libs/dynamodb-lib";
+import * as dynamoDbLib from "./libs/dynamo-lib";
 import { success, failure } from "./libs/response-lib";
 
 export async function main(event, context, callback) {
