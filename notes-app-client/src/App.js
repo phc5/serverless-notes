@@ -1,13 +1,52 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Nav, Navbar } from "react-bootstrap";
+import { Nav, Navbar, NavItem } from "react-bootstrap";
+
 import "./App.css";
+
 import Routes from "./Routes";
 import RouteNavItem from "./components/RouteNavItem";
+import { authUser, signOutUser } from "./libs/awsLib";
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    
+    this.state = {
+      isAuthenticated: false,
+      isAuthenticating: true
+    };
+  }
+
+  async componentDidMount() {
+    try {
+      if (await authUser()) {
+        this.userHasAuthenticated(true);
+      }
+    } catch(e) {
+      alert("Not Authenticated");
+    }
+
+    this.setState({ isAuthenticating: false });
+  }
+
+  handleLogout = event => {
+    signOutUser();
+    this.userHasAuthenticated(false);
+  }
+
+  userHasAuthenticated = authenticated => {
+    this.setState({ isAuthenticated: authenticated });
+  }
+
   render() {
+    const childProps = {
+      isAuthenticated: this.state.isAuthenticated,
+      userHasAuthenticated: this.userHasAuthenticated
+    };
+
     return (
+      !this.state.isAuthenticating &&
       <div className="app container">
         <Navbar fluid collapseOnSelect>
           <Navbar.Header>
@@ -18,12 +57,20 @@ class App extends Component {
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav pullRight>
-              <RouteNavItem href="/signup">Signup</RouteNavItem>
-              <RouteNavItem href="/login">Login</RouteNavItem>
+              {this.state.isAuthenticated
+                ? <NavItem onClick={this.handleLogout}>Logout</NavItem>
+                : [
+                    <RouteNavItem key={1} href="/signup">
+                      Signup
+                    </RouteNavItem>,
+                    <RouteNavItem key={2} href="/login">
+                      Login
+                    </RouteNavItem>
+                  ]}
             </Nav>
           </Navbar.Collapse>
         </Navbar>
-        <Routes />
+        <Routes childProps={childProps} />
       </div>
     );
   }
