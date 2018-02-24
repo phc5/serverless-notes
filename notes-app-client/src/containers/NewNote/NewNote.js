@@ -33,20 +33,20 @@ export default class NewNote extends Component {
 
   handleSubmit = async event => {
     event.preventDefault();
-
+  
     if (this.file && this.file.size > config.MAX_ATTACHMENT_SIZE) {
       alert("Please pick a file smaller than 5MB");
       return;
     }
-
+  
     this.setState({ isLoading: true });
-
+  
     try {
       const uploadedFilename = this.file
-      ? (await s3Upload(this.file)).Location
-      : null;
-
-    await this.createNote({
+        ? (await s3Upload(this.file)).Location
+        : null;
+  
+      await this.createNote({
         content: this.state.content,
         attachment: uploadedFilename
       });

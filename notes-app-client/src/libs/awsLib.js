@@ -52,6 +52,7 @@ export async function s3Upload(file) {
   }
 
   const s3 = new AWS.S3({
+    region: "us-east-1",
     params: {
       Bucket: config.s3.BUCKET
     }
@@ -66,6 +67,24 @@ export async function s3Upload(file) {
       ContentType: file.type,
       ACL: "public-read"
     })
+    .promise();
+}
+
+export async function s3Delete(file) {
+  if (!await authUser()) {
+    throw new Error("User is not logged in");
+  }
+
+  const s3 = new AWS.S3({
+    region: "us-east-1",
+    params: {
+      Bucket: config.s3.BUCKET,
+      Key: file 
+    }
+  });
+
+  return s3
+    .deleteObject()
     .promise();
 }
 
